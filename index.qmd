@@ -8,52 +8,9 @@ execute:
 ```{r}
 #| message: false
 library(tidyverse)
+library(knitr)
 ```
 
 ```{r}
-#| message: false
-billboard_long <- tidyr::billboard |>
-  pivot_longer(
-    cols = starts_with("wk"),
-    names_to = "week",
-    values_to = "rank",
-    values_drop_na = TRUE
-  ) |>
-  mutate(week = readr::parse_number(week)) |>
-  group_by(track, artist) |>
-  mutate(weeks_on_chart = n()) |>
-  ungroup()
-
-longest_running <- billboard_long |>
-  distinct(track, artist, weeks_on_chart) |>
-  slice_max(weeks_on_chart, n = 12, with_ties = FALSE)
-
-billboard_long |>
-  semi_join(longest_running, by = c("track", "artist", "weeks_on_chart")) |>
-  ggplot(aes(week, rank, group = interaction(track, artist),
-             color = weeks_on_chart)) +
-  geom_line(linewidth = 1.2, alpha = 0.9) +
-  scale_y_reverse(breaks = c(1, 10, 20, 40, 60, 100)) +
-  scale_color_viridis_c(option = "magma", direction = -1, name = "Weeks\non chart") +
-  labs(
-    title = "Songs that wouldn't leave the charts",
-    subtitle = "Weekly Billboard Hot 100 rank for the 12 longest-running tracks",
-    x = "Week on the chart",
-    y = "Billboard rank",
-    caption = "Lower rank numbers are better"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.background = element_rect(fill = "#10131f", color = NA),
-    panel.background = element_rect(fill = "#10131f", color = NA),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(color = "#34384a"),
-    text = element_text(color = "#f4f1de"),
-    axis.text = element_text(color = "#c5c8d6"),
-    plot.title = element_text(face = "bold", size = 20, color = "#ffcc66"),
-    plot.subtitle = element_text(color = "#c5c8d6"),
-    legend.background = element_rect(fill = "#10131f", color = NA),
-    legend.title = element_text(color = "#f4f1de"),
-    legend.text = element_text(color = "#c5c8d6")
-  )
+include_graphics("billboard.png")
 ```
